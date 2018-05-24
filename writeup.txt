@@ -1,0 +1,14 @@
+Name: Yangxin Zhong
+
+SuNet ID: yangxin
+
+Tasks: All basic tasks implemented
+
+Extra credits: VertexBevel, EdgeBevel, FaceBevel, EraseVertex, EraseEdge, Triangulation
+
+Comments and considerations: 
+	1. I spent a lot of time on edge cases, but might still have error in extreme edge cases;
+	2. When editing mesh with boundary, sometimes it fails to render some edges or faces, but
+	   those edges or faces are still there. If you click on them, you can still select them.
+	   There might exist some issues in the rendering part of the skeleton code, since the
+	   build from TA also have similar problems.
