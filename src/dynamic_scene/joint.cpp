@@ -71,6 +71,25 @@ StaticScene::SceneObject* Joint::get_static_object() { return nullptr; }
 // The real calculation.
 void Joint::calculateAngleGradient(Joint* goalJoint, Vector3D q) {
   // TODO (Animation) task 2B
+  Vector3D end_pos = goalJoint->getEndPosInWorld();
+  vector<Vector3D> axes;
+  axes.push_back(Vector3D());
+  axes.push_back(Vector3D());
+  axes.push_back(Vector3D());
+
+  Joint* j = goalJoint;
+  while (j->parent != nullptr) {
+    j->getAxes(axes);
+    Vector3D base_pos = j->getBasePosInWorld();
+    Vector3D p = end_pos - base_pos;
+
+    for (int i = 0; i < 3; i++) {
+      Vector3D r = axes[i];
+      Vector3D J = cross(r, p);
+      j->ikAngleGradient[i] += dot(J, end_pos - q);
+    }
+    j = j->parent;
+  }
 }
 
 // The constructor sets the dynamic angle and velocity of
@@ -143,6 +162,16 @@ Matrix4x4 Joint::getTransformation() {
   */
 
   Matrix4x4 T = Matrix4x4::identity();
+  Joint* p = parent;
+  while (p != nullptr) {
+    if (p->parent == nullptr)
+      T = Matrix4x4::translation(p->position) * T;
+    else
+      T = Matrix4x4::translation(p->axis) * T;
+    T = p->getRotation() * T;
+    p = p->parent;
+  }
+  T = skeleton->mesh->getTransformation() * T;
   return T;
 }
 
@@ -165,7 +194,10 @@ Vector3D Joint::getBasePosInWorld() {
   base position in world coordinate frame.
   */
 
-  return Vector3D();
+  Vector4D p = Vector4D(0, 0, 0, 1);
+  p = Joint::getTransformation() * p;
+  Vector3D q = p.to3D();
+  return q;
 }
 
 Vector3D Joint::getEndPosInWorld() {
@@ -175,7 +207,12 @@ Vector3D Joint::getEndPosInWorld() {
   position in world coordinate frame.
   */
 
-  return Vector3D();
+  Vector4D p = Vector4D(0 ,0, 0, 1);
+  p = Matrix4x4::translation(axis) * p;
+  p = getRotation() * p;
+  p = Joint::getTransformation() * p;
+  Vector3D q = p.to3D();
+  return q;
 }
 }  // namespace DynamicScene
 }  // namespace CS248
