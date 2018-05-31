@@ -196,7 +196,7 @@ Vector3D Joint::getBasePosInWorld() {
 
   Vector4D p = Vector4D(0, 0, 0, 1);
   p = Joint::getTransformation() * p;
-  Vector3D q = p.to3D();
+  Vector3D q = p.projectTo3D();
   return q;
 }
 
@@ -211,7 +211,7 @@ Vector3D Joint::getEndPosInWorld() {
   p = Matrix4x4::translation(axis) * p;
   p = getRotation() * p;
   p = Joint::getTransformation() * p;
-  Vector3D q = p.to3D();
+  Vector3D q = p.projectTo3D();
   return q;
 }
 }  // namespace DynamicScene
