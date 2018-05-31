@@ -47,6 +47,59 @@ Mesh::Mesh(Collada::PolymeshInfo &polyMesh, const Matrix4x4 &transform) {
 
 void Mesh::linearBlendSkinning(bool useCapsuleRadius) {
   // TODO (Animation) Task 3a, Task 3b
+  vector<Matrix4x4> Trans;
+  vector<Matrix4x4> BindTransInv;
+  for (int i = 0; i < skeleton->joints.size(); i++) {
+    Joint* j = skeleton->joints[i];
+    Matrix4x4 T = j->getTransformation() * j->getRotation();
+    Matrix4x4 BindT = j->getBindTransformation();
+    Trans.push_back(T);
+    BindTransInv.push_back(BindT.inv());
+  }
+  for (VertexIter v = mesh.verticesBegin(); v != mesh.verticesEnd(); v++) {
+    Vector4D v_bindPos = Vector4D(v->bindPosition, 1);
+    vector<LBSInfo> info_list;
+    double dis_inv_sum = 0.0;
+    for (int i = 0; i < skeleton->joints.size(); i++) {
+      Joint* j = skeleton->joints[i];
+      if (j->parent == nullptr)
+        continue;
+      Matrix4x4 T = Trans[i];
+      Matrix4x4 BindT_inv = BindTransInv[i];
+
+      Vector4D v_jCoord = BindT_inv * v_bindPos;
+      Vector4D v_worldCoord = T * v_jCoord;
+      Vector3D blendPos = v_worldCoord.projectTo3D();
+
+      Vector3D v_3D = v_jCoord.projectTo3D();
+      Vector3D bone_seg = j->axis;
+      double dot_prod1 = dot(v_3D, bone_seg);
+      double dot_prod2 = dot(v_3D - bone_seg, -bone_seg);
+      double distance = 0.0;
+      if (dot_prod1 <= 0.0)
+        distance = v_3D.norm();
+      else if (dot_prod2 <= 0.0)
+        distance = (v_3D - bone_seg).norm();
+      else
+        distance = cross(v_3D, bone_seg).norm() / (bone_seg.norm() + 1e-6);
+
+      if (useCapsuleRadius == false || distance <= j->capsuleRadius) {
+        LBSInfo info;
+        info.blendPos = blendPos;
+        info.distance = distance;
+        info_list.push_back(info);
+        dis_inv_sum += 1.0 / (distance + 1e-8);
+      }
+    }
+
+    if (info_list.size() == 0)
+      continue;
+    Vector3D skinnedPos = Vector3D(0, 0, 0);
+    for (LBSInfo info : info_list) {
+      skinnedPos += ((1.0 / (info.distance + 1e-8)) / dis_inv_sum) * info.blendPos;
+    }
+    v->position = skinnedPos;
+  }
 }
 
 void Mesh::forward_euler(float timestep, float damping_factor) {
