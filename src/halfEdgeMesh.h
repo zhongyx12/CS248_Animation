@@ -647,6 +647,8 @@ class Vertex : public HalfedgeElement {
 
   float offset;
   float velocity;
+  float new_offset;
+  float new_velocity;
   float laplacian() const;
 
   /**

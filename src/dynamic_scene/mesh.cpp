@@ -103,11 +103,27 @@ void Mesh::linearBlendSkinning(bool useCapsuleRadius) {
 }
 
 void Mesh::forward_euler(float timestep, float damping_factor) {
-  // TODO (Animation) Task 4
+	// TODO (Animation) Task 4
+	for (VertexIter v = mesh.verticesBegin(); v != mesh.verticesEnd(); v++) {
+		v->new_offset = v->offset + v->velocity * timestep;
+		v->new_velocity = v->velocity + (v->laplacian() - damping_factor * v->velocity) * timestep;
+	}
+	for (VertexIter v = mesh.verticesBegin(); v != mesh.verticesEnd(); v++) {
+		v->offset = v->new_offset;
+		v->velocity = v->new_velocity;
+	}
 }
 
 void Mesh::symplectic_euler(float timestep, float damping_factor) {
-  // TODO (Animation) Task 4
+	// TODO (Animation) Task 4
+	for (VertexIter v = mesh.verticesBegin(); v != mesh.verticesEnd(); v++) {
+		v->new_velocity = v->velocity + (v->laplacian() - damping_factor * v->velocity) * timestep;
+		v->new_offset = v->offset + v->new_velocity * timestep;
+	}
+	for (VertexIter v = mesh.verticesBegin(); v != mesh.verticesEnd(); v++) {
+		v->offset = v->new_offset;
+		v->velocity = v->new_velocity;
+	}
 }
 
 void Mesh::resetWave() {
