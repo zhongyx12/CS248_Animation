@@ -208,7 +208,10 @@ Vector3D Joint::getEndPosInWorld() {
   */
 
   Vector4D p = Vector4D(0 ,0, 0, 1);
-  p = Matrix4x4::translation(axis) * p;
+  if (parent == nullptr)
+    p = Matrix4x4::translation(position) * p;
+  else
+    p = Matrix4x4::translation(axis) * p;
   p = getRotation() * p;
   p = Joint::getTransformation() * p;
   Vector3D q = p.projectTo3D();
