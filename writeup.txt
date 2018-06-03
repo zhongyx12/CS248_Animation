@@ -1,14 +1,16 @@
-Name: Yangxin Zhong
+CS248 Final Project
 
-SuNet ID: yangxin
+Name: Yangxin Zhong, Zhi Bie
 
-Tasks: All basic tasks implemented
+SuNet ID: yangxin, zhib
 
-Extra credits: VertexBevel, EdgeBevel, FaceBevel, EraseVertex, EraseEdge, Triangulation
+Project title: Animation: forward and inverse kinematics
 
-Comments and considerations: 
-	1. I spent a lot of time on edge cases, but might still have error in extreme edge cases;
-	2. When editing mesh with boundary, sometimes it fails to render some edges or faces, but
-	   those edges or faces are still there. If you click on them, you can still select them.
-	   There might exist some issues in the rendering part of the skeleton code, since the
-	   build from TA also have similar problems.
+Deliverable: 
+	1. We have implemented 4 tools for animation: spline interpolation, forward and inverse kinematics, linear blend skinning, and physical simulation.
+
+	2. We drew an animation of a dancing man with our tools. You can place 'Cardinal3D_buffer2.dae' and 'Cardinal3D_buffer2_0_skel.xml' files into Cardinal3D\build\src folder, run the program, and press w 2 to load the animation. We also provide a screen record of the dancing man video in 'dancing.mp4'.
+
+Comment:
+	We built this animation by first loading the human mesh, then draw skeleton to control the mesh. The control radius of each joint is adjusted for the best effect.
+
